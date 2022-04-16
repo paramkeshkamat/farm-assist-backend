@@ -1,7 +1,6 @@
 /** @format */
 
 const createError = require("http-errors");
-const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { getJwtToken } = require("../helpers/jwtHelper");
 
@@ -41,8 +40,9 @@ module.exports = {
         throw createError.UnprocessableEntity("Phone Number is required!");
       }
       const doesExist = await User.findOne({ phoneNumber });
+      console.log(doesExist);
       if (!doesExist) {
-        throw createError.Unauthorized("User does not exist");
+        res.json({ message: "User does not exist" });
       } else {
         const token = getJwtToken(doesExist._id);
         res.status(200).json({

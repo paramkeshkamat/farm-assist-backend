@@ -21,9 +21,9 @@ app.use(cors());
 app.get("/", (req, res) => res.send("Home Page"));
 app.use("/auth", require("./routes/auth"));
 app.use("/user", require("./routes/user"));
+app.use("/seller", require("./routes/seller"));
 app.use("/api/products", require("./routes/product"));
 app.use("/api/orders", require("./routes/order"));
-app.use("/api/forum", require("./routes/forum"));
 
 // PAGE NOT FOUND
 app.use((req, res, next) => next(createError.NotFound()));

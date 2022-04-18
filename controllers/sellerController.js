@@ -28,12 +28,14 @@ module.exports = {
         password: "test",
         status: "Not Approved",
       });
-      
+
       const savedSeller = await seller.save();
+      console.log(savedSeller);
       res.status(201).json({
         message: "Seller created successfully",
       });
     } catch (err) {
+      console.log(err.message);
       next(err);
     }
   },

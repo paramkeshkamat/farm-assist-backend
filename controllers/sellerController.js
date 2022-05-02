@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const Seller = require("../models/seller");
 const { getJwtToken } = require("../helpers/jwtHelper");
 const mongoose = require("mongoose");
+const sendMail = require("../helpers/sendMail");
 
 module.exports = {
   createSeller: async (req, res, next) => {
@@ -43,7 +44,6 @@ module.exports = {
   getSeller: async (req, res, next) => {
     try {
       const seller = await Seller.findOne({ _id: req.params.id }, { password: 0, __v: 0 });
-      // console.log(req.query.id, seller);
       if (!seller) {
         throw createError.NotFound("Seller not found");
       }
@@ -63,9 +63,31 @@ module.exports = {
       if (!status) {
         throw createError.UnprocessableEntity("Please send status");
       }
-      const seller = await Seller.find({ status });
+      const seller = await Seller.find({ status }, { password: 0, __v: 0 });
       res.send(seller);
     } catch (err) {
+      next(err);
+    }
+  },
+
+  changeStatus: async (req, res, next) => {
+    try {
+      const { status, email } = req.body;
+      const { id } = req.params;
+      if (!status) {
+        throw createError.UnprocessableEntity("Please send status");
+      }
+      const updatedSeller = await Seller.findByIdAndUpdate(id, { status }, { new: true });
+      if (updatedSeller) {
+        sendMail(email, "Seller Approval for FarmAssist", "test mail");
+        res.send({ message: "Seller status updated successfully" });
+      }
+    } catch (err) {
+      console.log(err.message);
+      if (err instanceof mongoose.CastError) {
+        next(createError.BadRequest("Invalid seller id"));
+        return;
+      }
       next(err);
     }
   },

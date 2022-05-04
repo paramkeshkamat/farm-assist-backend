@@ -40,7 +40,6 @@ module.exports = {
         throw createError.UnprocessableEntity("Phone Number is required!");
       }
       const doesExist = await User.findOne({ phoneNumber });
-      console.log(doesExist);
       if (!doesExist) {
         res.json({ message: "User does not exist" });
       } else {

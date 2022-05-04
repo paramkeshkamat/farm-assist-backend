@@ -11,8 +11,6 @@ function sendMail(to, subject, html) {
     },
   });
 
-  console.log(to, subject, html);
-
   var mailOptions = {
     from: process.env.USER,
     to,

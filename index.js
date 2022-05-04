@@ -18,13 +18,14 @@ app.use(express.static(path.join(__dirname, "/uploads")));
 app.use(cors());
 
 // ROUTES
-app.get("/", (req, res) => res.send("Home Page"));
+app.get("/", (req, res) => res.send("Farm Assist API Service"));
 app.use("/auth", require("./routes/auth"));
 app.use("/user", require("./routes/user"));
-app.use("/seller", require("./routes/seller"));
-app.use("/api/products", require("./routes/product"));
+app.use("/", require("./routes/seller"));
+app.use("/api", require("./routes/product"));
 app.use("/api/orders", require("./routes/order"));
 app.use("/api/razorpay", require("./routes/razorpay"));
+app.use("/api/contactus", require("./routes/contactus"));
 
 // PAGE NOT FOUND
 app.use((req, res, next) => next(createError.NotFound()));

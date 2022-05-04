@@ -35,10 +35,6 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  totalSales: {
-    type: Number,
-    required: true,
-  },
 });
 
 const Product = mongoose.model("product", ProductSchema);

@@ -1,3 +1,5 @@
+/** @format */
+
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 const Product = require("../models/product");
@@ -52,33 +54,30 @@ module.exports = {
         productPrice,
         productDescription,
         productCategory,
-        sellerId,
         quantity,
         measurement,
+        productImage,
       } = req.body;
       if (
         !productName ||
-        !productPrice ||
         !productDescription ||
         !productCategory ||
-        !sellerId ||
+        !productPrice ||
         !quantity ||
-        !measurement
+        !measurement ||
+        !productImage
       ) {
-        throw createError.UnprocessableEntity(
-          "Please send all the required details"
-        );
+        throw createError.UnprocessableEntity("Please send all the required details");
       }
       const product = new Product({
         productName,
         productPrice,
-        productImage: "",
+        productImage,
         productDescription,
         productCategory,
-        sellerId,
+        sellerId: req.user,
         quantity,
         measurement,
-        reviews: [],
       });
       const savedProduct = await product.save();
       res.status(201).json({
@@ -86,10 +85,6 @@ module.exports = {
         message: "Product created successfully",
       });
     } catch (err) {
-      if (err.name === "ValidationError") {
-        next(createError.UnprocessableEntity(err.message));
-        return;
-      }
       next(err);
     }
   },
@@ -97,25 +92,13 @@ module.exports = {
   updateProduct: async (req, res, next) => {
     try {
       const { id } = req.params;
-      let updatedProduct;
-      if (req.file) {
-        updatedProduct = await Product.findByIdAndUpdate(
-          id,
-          {
-            ...req.body,
-            productImage: "http://localhost:8000/" + req.file.filename,
-          },
-          { new: true }
-        );
-      } else {
-        updatedProduct = await Product.findByIdAndUpdate(
-          id,
-          {
-            ...req.body,
-          },
-          { new: true }
-        );
-      }
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        {
+          ...req.body,
+        },
+        { new: true },
+      );
       if (!updatedProduct) {
         throw createError.NotFound("Product not found");
       }
@@ -135,6 +118,7 @@ module.exports = {
   deleteProduct: async (req, res, next) => {
     try {
       const { id } = req.params;
+      console.log(id);
       const deletedProduct = await Product.findByIdAndDelete(id);
       if (!deletedProduct) {
         throw createError.NotFound("Product not found");
@@ -148,6 +132,15 @@ module.exports = {
         next(createError.BadRequest("Invalid user id"));
         return;
       }
+      next(err);
+    }
+  },
+
+  getProductsOfSeller: async (req, res, next) => {
+    try {
+      const product = await Product.find({ sellerId: req.user }, { __v: 0 });
+      res.status(200).json(product);
+    } catch (err) {
       next(err);
     }
   },
